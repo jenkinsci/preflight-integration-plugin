@@ -199,21 +199,23 @@ public class PreflightBuilder extends Builder implements SimpleBuildStep {
             if (!platforms.isEmpty()) {
                 List<String> platformBrowserList = Arrays.asList(platforms.split(","));
                 String jsonString = "[";
+                StringBuffer bufferPlatform = new StringBuffer();
                 for (String platformBrowser : platformBrowserList) {
-                    jsonString += GetPlatformAndBrowser(platformBrowser) + ",";
+                    bufferPlatform.append(GetPlatformAndBrowser(platformBrowser) + ",");
                 }
-                jsonString = RemoveLastChar(jsonString) + "]";
+                String appendedPlatforms = bufferPlatform.toString();
+                jsonString += RemoveLastChar(appendedPlatforms) + "]";
                 json.put("platforms", JSONArray.fromObject(jsonString));
             }
             if (!sizes.isEmpty()) {
                 List<String> sizeList = Arrays.asList(sizes.split(","));
-                
                 String jsonString = "[";
+                StringBuffer bufferSizes = new StringBuffer();
                 for (String size : sizeList) {
-                   jsonString += GetSizes(size) + ","; 
+                    bufferSizes.append(GetSizes(size) + ",");
                 }
-                jsonString = RemoveLastChar(jsonString) + "]";
-                
+                String appendedSizes = bufferSizes.toString();
+                jsonString += RemoveLastChar(appendedSizes) + "]";
                 json.put("sizes", JSONArray.fromObject(jsonString));
             }
             json.put("captureScreenshots", captureScreenshots);
@@ -337,8 +339,7 @@ public class PreflightBuilder extends Builder implements SimpleBuildStep {
         ResponseHandler<String> responseHandler = response -> {
             int status = response.getStatusLine().getStatusCode();
             if (status >= 200 && status < 300) {
-                HttpEntity responseEntity = response.getEntity();
-                return responseEntity != null ? EntityUtils.toString(responseEntity) : null;
+                return EntityUtils.toString(response.getEntity());
             } else {
                 throw new ClientProtocolException("Unexpected response status: " + status);
             }
