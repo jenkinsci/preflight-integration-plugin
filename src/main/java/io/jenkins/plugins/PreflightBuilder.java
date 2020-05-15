@@ -152,97 +152,95 @@ public class PreflightBuilder extends Builder implements SimpleBuildStep {
     }
     
     private String GetToken() throws Exception {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()){
-            final RequestConfig config = RequestConfig.custom()
-                    .setConnectTimeout(60 * 1000)
-                    .setConnectionRequestTimeout(60 * 1000)
-                    .setSocketTimeout(60 * 1000)
-                    .build();
-
-            final HttpPost request = new HttpPost(API_TOKEN_URL);
-            request.setConfig(config);
-            request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-      
-            List <NameValuePair> nvps = new ArrayList <>();
-            nvps.add(new BasicNameValuePair("client_id", clientId));
-            nvps.add(new BasicNameValuePair("client_secret", clientSecret.getPlainText()));
-            nvps.add(new BasicNameValuePair("grant_type", "client_credentials"));
-            nvps.add(new BasicNameValuePair("scope", "tests_run"));
-            request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
-            
-            logger.println("Executing Get Token :" + request.getRequestLine());
-            
-            String responseBody = httpclient.execute(request, HandleResponse());
-            logger.println("Get Token is successfull");
-            
-            JSONObject result = JSONObject.fromObject(responseBody);
-            return result.get("access_token").toString();
-        } 
-    }
-    
-    private String RunTest(String accessToken) throws Exception {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()){   
-            JSONObject json = new JSONObject();
-            
-            String requestPath = "";
-            if (!testId.isEmpty()) {
-                requestPath = "/"+ testId +"/Run";
-            }
-            else if (!groupId.isEmpty()) {
-                requestPath = "/Run";
-                json.put("groupId", groupId);
-            }
-            
-            if (!environmentId.isEmpty()) {
-                json.put("environmentId", environmentId);
-            }
-            if (!platforms.isEmpty()) {
-                List<String> platformBrowserList = Arrays.asList(platforms.split(","));
-                String jsonString = "[";
-                StringBuffer bufferPlatform = new StringBuffer();
-                for (String platformBrowser : platformBrowserList) {
-                    bufferPlatform.append(GetPlatformAndBrowser(platformBrowser) + ",");
-                }
-                String appendedPlatforms = bufferPlatform.toString();
-                jsonString += RemoveLastChar(appendedPlatforms) + "]";
-                json.put("platforms", JSONArray.fromObject(jsonString));
-            }
-            if (!sizes.isEmpty()) {
-                List<String> sizeList = Arrays.asList(sizes.split(","));
-                String jsonString = "[";
-                StringBuffer bufferSizes = new StringBuffer();
-                for (String size : sizeList) {
-                    bufferSizes.append(GetSizes(size) + ",");
-                }
-                String appendedSizes = bufferSizes.toString();
-                jsonString += RemoveLastChar(appendedSizes) + "]";
-                json.put("sizes", JSONArray.fromObject(jsonString));
-            }
-            json.put("captureScreenshots", captureScreenshots);
-            
-            final RequestConfig config = RequestConfig.custom()
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        final RequestConfig config = RequestConfig.custom()
                 .setConnectTimeout(60 * 1000)
                 .setConnectionRequestTimeout(60 * 1000)
                 .setSocketTimeout(60 * 1000)
                 .build();
 
-            final HttpPost request = new HttpPost(API_RUN_URL + requestPath);
-            request.setConfig(config);
-            request.setHeader("Content-Type", "application/json");
-            request.setHeader("Authorization", "Bearer " + accessToken); 
-            
-            StringEntity body = new StringEntity(json.toString());
-            request.setEntity((HttpEntity) body);
-            
-            logger.println("Executing Run Test :" + request.getRequestLine());
-            logger.println("Request :" + json.toString());
-            
-            String responseBody = httpclient.execute(request, HandleResponse());
-            logger.println("Response Run Test :" + responseBody);
-            
-            JSONObject result = JSONObject.fromObject(responseBody);
-            return result.get("testRunId").toString();
-        } 
+        final HttpPost request = new HttpPost(API_TOKEN_URL);
+        request.setConfig(config);
+        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+        List <NameValuePair> nvps = new ArrayList <>();
+        nvps.add(new BasicNameValuePair("client_id", clientId));
+        nvps.add(new BasicNameValuePair("client_secret", clientSecret.getPlainText()));
+        nvps.add(new BasicNameValuePair("grant_type", "client_credentials"));
+        nvps.add(new BasicNameValuePair("scope", "tests_run"));
+        request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
+        
+        logger.println("Executing Get Token :" + request.getRequestLine());
+        
+        String responseBody = httpclient.execute(request, HandleResponse());
+        logger.println("Get Token is successfull");
+        
+        JSONObject result = JSONObject.fromObject(responseBody);
+        return result.get("access_token").toString();
+    }
+    
+    private String RunTest(String accessToken) throws Exception {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        JSONObject json = new JSONObject();
+        
+        String requestPath = "";
+        if (!testId.isEmpty()) {
+            requestPath = "/"+ testId +"/Run";
+        }
+        else if (!groupId.isEmpty()) {
+            requestPath = "/Run";
+            json.put("groupId", groupId);
+        }
+        
+        if (!environmentId.isEmpty()) {
+            json.put("environmentId", environmentId);
+        }
+        if (!platforms.isEmpty()) {
+            List<String> platformBrowserList = Arrays.asList(platforms.split(","));
+            String jsonString = "[";
+            StringBuffer bufferPlatform = new StringBuffer();
+            for (String platformBrowser : platformBrowserList) {
+                bufferPlatform.append(GetPlatformAndBrowser(platformBrowser) + ",");
+            }
+            String appendedPlatforms = bufferPlatform.toString();
+            jsonString += RemoveLastChar(appendedPlatforms) + "]";
+            json.put("platforms", JSONArray.fromObject(jsonString));
+        }
+        if (!sizes.isEmpty()) {
+            List<String> sizeList = Arrays.asList(sizes.split(","));
+            String jsonString = "[";
+            StringBuffer bufferSizes = new StringBuffer();
+            for (String size : sizeList) {
+                bufferSizes.append(GetSizes(size) + ",");
+            }
+            String appendedSizes = bufferSizes.toString();
+            jsonString += RemoveLastChar(appendedSizes) + "]";
+            json.put("sizes", JSONArray.fromObject(jsonString));
+        }
+        json.put("captureScreenshots", captureScreenshots);
+        
+        final RequestConfig config = RequestConfig.custom()
+            .setConnectTimeout(60 * 1000)
+            .setConnectionRequestTimeout(60 * 1000)
+            .setSocketTimeout(60 * 1000)
+            .build();
+
+        final HttpPost request = new HttpPost(API_RUN_URL + requestPath);
+        request.setConfig(config);
+        request.setHeader("Content-Type", "application/json");
+        request.setHeader("Authorization", "Bearer " + accessToken); 
+        
+        StringEntity body = new StringEntity(json.toString());
+        request.setEntity((HttpEntity) body);
+        
+        logger.println("Executing Run Test :" + request.getRequestLine());
+        logger.println("Request :" + json.toString());
+        
+        String responseBody = httpclient.execute(request, HandleResponse());
+        logger.println("Response Run Test :" + responseBody);
+        
+        JSONObject result = JSONObject.fromObject(responseBody);
+        return result.get("testRunId").toString();
     }
     
     private String GetPlatformAndBrowser(String platformBrowser) throws Exception{
@@ -298,41 +296,41 @@ public class PreflightBuilder extends Builder implements SimpleBuildStep {
     }
     
     private String CheckStatus(String accessToken, String testRunId) throws Exception {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()){
-            final RequestConfig config = RequestConfig.custom()
-                    .setConnectTimeout(60 * 1000)
-                    .setConnectionRequestTimeout(60 * 1000)
-                    .setSocketTimeout(60 * 1000)
-                    .build();
+        CloseableHttpClient httpclient = HttpClients.createDefault();
 
-            final HttpGet request = new HttpGet(API_RUN_URL + "/Run/" + testRunId);
-            request.setConfig(config);
-            request.setHeader("Content-Type", "application/json");
-            request.setHeader("Authorization", "Bearer " + accessToken);    
-            
-            logger.println("Executing Check Status :" + request.getRequestLine());
-            
-            String responseBody = httpclient.execute(request, HandleResponse());
-            logger.println("Response Check Status :" + responseBody);
-            
-            JSONObject result = JSONObject.fromObject(responseBody);
-            JSONArray results = result.getJSONArray("results");
-            
-            String status = "Success";
-            
-            for (int i=0; i<results.size(); i++) {
-                JSONObject resultItem = results.getJSONObject(i);
-                status = resultItem.getString("status");
-                if ("Failed".equalsIgnoreCase(status)) {
-                    break;
-                }
-                else if ("Queued".equalsIgnoreCase(status) || "Running".equalsIgnoreCase(status)){
-                    status = "Waiting";
-                    break;
-                }
+        final RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(60 * 1000)
+                .setConnectionRequestTimeout(60 * 1000)
+                .setSocketTimeout(60 * 1000)
+                .build();
+
+        final HttpGet request = new HttpGet(API_RUN_URL + "/Run/" + testRunId);
+        request.setConfig(config);
+        request.setHeader("Content-Type", "application/json");
+        request.setHeader("Authorization", "Bearer " + accessToken);    
+        
+        logger.println("Executing Check Status :" + request.getRequestLine());
+        
+        String responseBody = httpclient.execute(request, HandleResponse());
+        logger.println("Response Check Status :" + responseBody);
+        
+        JSONObject result = JSONObject.fromObject(responseBody);
+        JSONArray results = result.getJSONArray("results");
+        
+        String status = "Success";
+        
+        for (int i=0; i<results.size(); i++) {
+            JSONObject resultItem = results.getJSONObject(i);
+            status = resultItem.getString("status");
+            if ("Failed".equalsIgnoreCase(status)) {
+                break;
             }
-            return status;
-        } 
+            else if ("Queued".equalsIgnoreCase(status) || "Running".equalsIgnoreCase(status)){
+                status = "Waiting";
+                break;
+            }
+        }
+        return status;
     }
        
     private ResponseHandler<String> HandleResponse(){
