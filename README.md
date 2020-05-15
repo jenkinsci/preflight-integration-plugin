@@ -1,4 +1,5 @@
 # PreFlight Jenkins Plugin
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/preflight-integration-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/preflight-integration-plugin/job/master/)
 
 ## Description
 This documentation provides you, how to run or trigger your PreFlight tests from Jenkins.   
@@ -28,16 +29,3 @@ This documentation provides you, how to run or trigger your PreFlight tests from
 `captureScreenshots (optional)` :  Enables taking screenhots of the each step.
 
 `waitResults (optional)` :  If you set it as `true`, your build waits your PreFlight test results.
-
-
-## Developer Notes
-
-###### Environment Setup
-Before you run this project you need to prepare your development environment. [This](https://jenkins.io/doc/developer/tutorial/prepare/) is a helpful document to prepare it.
-
-In this project used NetBeans as an IDE.  
-
-###### Build and Run
-After prepare your environment download or clone the project. 
-
-To run project open a command prompt and navigate to source. Then execute `mvn hpi:run` command. After build open a browser and navigate to `http://localhost:8080/jenkins/`. Local Jenkins instance will be up and running for the development.

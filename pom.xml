@@ -16,7 +16,7 @@
         <java.level>8</java.level>
     </properties>
     <name>PreFlight</name>
-    <description>Run PreFlight tests</description>
+    <description>Run your PreFlight tests from Jenkins</description>
     <url>https://github.com/jenkinsci/preflight-integration-plugin</url>
     <licenses>
         <license>
