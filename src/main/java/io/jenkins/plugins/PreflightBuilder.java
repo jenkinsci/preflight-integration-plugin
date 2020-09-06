@@ -189,12 +189,11 @@ public class PreflightBuilder extends Builder implements SimpleBuildStep {
         try{
             JSONObject json = new JSONObject();
 
-            String requestPath = "";
+            String requestPath = "/Run";
             if (!testId.isEmpty()) {
                 requestPath = "/"+ testId +"/Run";
             }
             else if (!groupId.isEmpty()) {
-                requestPath = "/Run";
                 json.put("groupId", groupId);
             }
 
